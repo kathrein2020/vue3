@@ -3,25 +3,61 @@
 <template>
   <div class="wrapper">
   <h1>погода </h1>
-  <p>узнать погоду в городе {{ city == "" ? "вашем городе" : "<<"+city+">>" }}</p>
+  <p>узнать погоду в городе {{ city == "" ? "вашем городе" : cityName }}</p>
   <input type="text" v-model="city" placeholder=" город">
   <!-- <button v-show="city != ''">получить погоду</button> -->
 
-  <button v-if="city !=''">получить погоду</button>
+  <button v-if="city !=''" @click="getWeather()">получить погоду</button>
   <button disabled v-else>введите название города </button>
+
+  <p class="error">{{ error }}</p>
+
+  <p v-show="info !=null">{{ info.data}}</p>
 </div> 
 </template>
 
 
 
 <script>
+
+import axios from 'axios'
+
 export default{
   data(){
     return {
-      city: ""
+      city: "",
+      error: " ",
+      info: null
     }
+  },
+
+
+  //для кавычек сити
+  computed : {
+    cityName() {
+      return "<<" + this.city + ">>"
+    }
+  },
+
+  methods: {
+    getWeather(){
+      // если буков меньше 2х то ошибка
+
+if (this.city.trim().length <2) {
+  this.error="нужно название более одного символа"
+  return false
+
+}
+
+this.error=""
+
+axios.get(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${this.city}?key=X4AUKJYNGJYW36MU2H9QYRY8G`)
+.then(res => (this.info = res))    
+
+}
   }
 }
+
 
 </script> 
 
@@ -80,6 +116,11 @@ export default{
   .wrapper button:disabled{
     background: #746027;
     cursor: not-allowed;
+  }
+
+  .error {
+    font-size:20px;
+    color: red;
   }
 
 </style>
